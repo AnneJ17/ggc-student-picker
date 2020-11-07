@@ -16,6 +16,9 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final _suggestions = <WordPair>[];
+  final _biggerFont = TextStyle(fontSize: 18.0);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,7 +41,17 @@ class _MyHomePageState extends State<MyHomePage> {
           )
         ]),
         body: Column(
-          children: <Widget>[Image.asset('assets/bbuildingwavy.jpg')],
+          children: <Widget>[
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  // Expanded(child: _buildSuggestions());
+                });
+              }, // handle your image tap here
+              child: Image.asset('assets/bbuildingwavy.jpg'),
+            ),
+            Expanded(child: _buildSuggestions())
+          ],
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
         floatingActionButton: FloatingActionButton(
@@ -59,13 +72,13 @@ class _MyHomePageState extends State<MyHomePage> {
             context, MaterialPageRoute(builder: (context) => AddNamePage()));
         break;
       case Constants.sort:
-        print("Sort");
+        _suggestions.sort();
         break;
       case Constants.shuffle:
-        print("Shuffle");
+        _suggestions.shuffle();
         break;
       case Constants.clear:
-        print("Clear");
+        _suggestions.clear();
         break;
       case Constants.about:
         Navigator.push(
@@ -73,17 +86,30 @@ class _MyHomePageState extends State<MyHomePage> {
         break;
     }
   }
-}
 
-class RandomWords extends StatefulWidget {
-  @override
-  _RandomWordsState createState() => _RandomWordsState();
-}
+  Widget _buildSuggestions() {
+    return ListView.builder(
+        padding: EdgeInsets.all(26.0),
+        itemCount: 5,
+        // Convert each item into a widget based on the type of item it is.
+        itemBuilder: (context, i) {
+          _suggestions.clear();
+          _suggestions.addAll(generateWordPairs().take(1));
+          print(_suggestions);
+          return _buildRow(_suggestions[0]);
+        });
+  }
 
-class _RandomWordsState extends State<RandomWords> {
-  @override
-  Widget build(BuildContext context) {
-    final wordPair = WordPair.random();
-    return Text(wordPair.asPascalCase);
+  Widget _buildRow(WordPair pair) {
+    // final visible = _visible.containsVisible();
+    return ListTile(
+      title: Text(
+        pair.asPascalCase,
+        style: _biggerFont,
+      ),
+      trailing: Wrap(
+        children: <Widget>[Icon(Icons.visibility_off)],
+      ),
+    );
   }
 }

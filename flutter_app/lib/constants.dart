@@ -1,5 +1,3 @@
-import 'package:flutter/cupertino.dart';
-
 class Constants {
   static const String sendReceive = 'Send/Receive';
   static const String addName = 'Add Name';
