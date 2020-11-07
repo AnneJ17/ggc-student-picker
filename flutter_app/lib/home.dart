@@ -45,7 +45,7 @@ class _MyHomePageState extends State<MyHomePage> {
             GestureDetector(
               onTap: () {
                 setState(() {
-                  // Expanded(child: _buildSuggestions());
+                  _suggestions.addAll(generateWordPairs().take(5));
                 });
               }, // handle your image tap here
               child: Image.asset('assets/bbuildingwavy.jpg'),
@@ -72,7 +72,7 @@ class _MyHomePageState extends State<MyHomePage> {
             context, MaterialPageRoute(builder: (context) => AddNamePage()));
         break;
       case Constants.sort:
-        _suggestions.sort();
+        _suggestions.sort((a, b) => a.toString().compareTo(b.toString()));
         break;
       case Constants.shuffle:
         _suggestions.shuffle();
@@ -90,25 +90,46 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget _buildSuggestions() {
     return ListView.builder(
         padding: EdgeInsets.all(26.0),
-        itemCount: 5,
+        itemCount: _suggestions.length,
         // Convert each item into a widget based on the type of item it is.
-        itemBuilder: (context, i) {
-          _suggestions.clear();
-          _suggestions.addAll(generateWordPairs().take(1));
-          print(_suggestions);
-          return _buildRow(_suggestions[0]);
+        itemBuilder: (context, index) {
+          return Dismissible(
+            background: stackBehindDismiss(),
+            key: ObjectKey(_suggestions[index]),
+            child: Container(
+              padding: EdgeInsets.all(20.0),
+              child: Text(
+                _suggestions[index].asPascalCase,
+                textScaleFactor: 1.3,
+              ),
+            ),
+            onDismissed: (direction) {
+              var item = _suggestions.elementAt(index);
+              //To delete
+              deleteItem(index);
+              //To show a snackbar when item is deleted
+              Scaffold.of(context).showSnackBar(SnackBar(
+                content: Text("$item deleted"),
+              ));
+            },
+          );
         });
   }
 
-  Widget _buildRow(WordPair pair) {
-    // final visible = _visible.containsVisible();
-    return ListTile(
-      title: Text(
-        pair.asPascalCase,
-        style: _biggerFont,
-      ),
-      trailing: Wrap(
-        children: <Widget>[Icon(Icons.visibility_off)],
+  void deleteItem(index) {
+    setState(() {
+      _suggestions.removeAt(index);
+    });
+  }
+
+  Widget stackBehindDismiss() {
+    return Container(
+      alignment: Alignment.centerRight,
+      padding: EdgeInsets.only(right: 20.0),
+      color: Colors.red,
+      child: Icon(
+        Icons.delete,
+        color: Colors.white,
       ),
     );
   }
