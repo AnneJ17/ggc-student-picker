@@ -1,15 +1,17 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
 import 'package:flutter_app/about.dart';
 import 'package:flutter_app/name.dart';
 import 'package:flutter_app/send_receive.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import 'constants.dart';
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
   final String title;
+  MyHomePage({Key key, @required this.title}) : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -17,7 +19,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final _suggestions = <WordPair>[];
-  final _biggerFont = TextStyle(fontSize: 18.0);
+  List<String> words = new List();
+  final prefs = SharedPreferences.getInstance();
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +49,9 @@ class _MyHomePageState extends State<MyHomePage> {
               onTap: () {
                 setState(() {
                   _suggestions.addAll(generateWordPairs().take(5));
+                  for (var i = 0; i < 5; i++) {
+                    words.add(_suggestions[i].first);
+                  }
                 });
               }, // handle your image tap here
               child: Image.asset('assets/bbuildingwavy.jpg'),
@@ -68,17 +74,16 @@ class _MyHomePageState extends State<MyHomePage> {
             MaterialPageRoute(builder: (context) => SendReceivePage()));
         break;
       case Constants.addName:
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => AddNamePage()));
+        _awaitReturnValueFromSecondScreen(context);
         break;
       case Constants.sort:
-        _suggestions.sort((a, b) => a.toString().compareTo(b.toString()));
+        words.sort((a, b) => a.toString().compareTo(b.toString()));
         break;
       case Constants.shuffle:
-        _suggestions.shuffle();
+        words.shuffle();
         break;
       case Constants.clear:
-        _suggestions.clear();
+        words.clear();
         break;
       case Constants.about:
         Navigator.push(
@@ -90,21 +95,22 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget _buildSuggestions() {
     return ListView.builder(
         padding: EdgeInsets.all(26.0),
-        itemCount: _suggestions.length,
+        itemCount: words.length,
         // Convert each item into a widget based on the type of item it is.
         itemBuilder: (context, index) {
+          writeState();
           return Dismissible(
             background: stackBehindDismiss(),
-            key: ObjectKey(_suggestions[index]),
+            key: ObjectKey(words[index]),
             child: Container(
               padding: EdgeInsets.all(20.0),
               child: Text(
-                _suggestions[index].asPascalCase,
+                words[index],
                 textScaleFactor: 1.3,
               ),
             ),
             onDismissed: (direction) {
-              var item = _suggestions.elementAt(index);
+              var item = words.elementAt(index);
               //To delete
               deleteItem(index);
               //To show a snackbar when item is deleted
@@ -118,7 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void deleteItem(index) {
     setState(() {
-      _suggestions.removeAt(index);
+      words.removeAt(index);
     });
   }
 
@@ -132,5 +138,34 @@ class _MyHomePageState extends State<MyHomePage> {
         color: Colors.white,
       ),
     );
+  }
+
+  void _awaitReturnValueFromSecondScreen(BuildContext context) async {
+    // starts the AddNamePage and wait for it to finish with a result
+    final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AddNamePage(),
+        ));
+
+    // after the SecondScreen result comes back update the list view
+    setState(() {
+      words.add(result);
+    });
+  }
+
+  /// Adding a list
+  @override
+  void writeState() async {
+    Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+    final SharedPreferences prefs = await _prefs;
+    await prefs.setStringList("MyList", words);
+  }
+
+  // writing data
+  @override
+  Future<List<String>> readState() async {
+    final pref = await SharedPreferences.getInstance();
+    return pref.getStringList("MyList");
   }
 }
