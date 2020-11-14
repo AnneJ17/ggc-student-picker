@@ -29,7 +29,7 @@ class _AddNamePageState extends State<AddNamePage> {
           actions: <Widget>[
             FlatButton(
               textColor: Colors.white,
-              child: Text("ADD", style: theme.textTheme.bodyText1),
+              child: Text("ADD"),
               onPressed: () {
                 _sendDataBack(context);
               },

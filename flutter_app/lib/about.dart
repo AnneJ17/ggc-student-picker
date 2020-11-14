@@ -5,7 +5,12 @@ class AboutPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: Icon(Icons.arrow_back),
+        leading: GestureDetector(
+          child: Icon(Icons.arrow_back),
+          onTap: () {
+            Navigator.pop(context, false);
+          },
+        ),
         title: Text('GGC Thorns, Roses and Buds'),
       ),
       body: Column(

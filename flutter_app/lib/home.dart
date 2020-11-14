@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
 import 'package:flutter_app/about.dart';
@@ -19,8 +16,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final _suggestions = <WordPair>[];
+  final _visible = Set<String>();
   List<String> words = new List();
-  final prefs = SharedPreferences.getInstance();
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   for (var i = 0; i < 5; i++) {
                     words.add(_suggestions[i].first);
                   }
+                  writeState();
                 });
               }, // handle your image tap here
               child: Image.asset('assets/bbuildingwavy.jpg'),
@@ -115,7 +113,7 @@ class _MyHomePageState extends State<MyHomePage> {
               deleteItem(index);
               //To show a snackbar when item is deleted
               Scaffold.of(context).showSnackBar(SnackBar(
-                content: Text("$item deleted"),
+                content: Text("Instance of word '$item' deleted"),
               ));
             },
           );
@@ -125,6 +123,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void deleteItem(index) {
     setState(() {
       words.removeAt(index);
+      writeState();
     });
   }
 
@@ -154,18 +153,25 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  /// Adding a list
   @override
-  void writeState() async {
-    Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
-    final SharedPreferences prefs = await _prefs;
-    await prefs.setStringList("MyList", words);
+  void initState() {
+    super.initState();
+    loadData();
   }
 
-  // writing data
-  @override
-  Future<List<String>> readState() async {
-    final pref = await SharedPreferences.getInstance();
-    return pref.getStringList("MyList");
+  void writeState() async {
+    // getting shared preferences object
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    // write
+    prefs.setStringList("my_string_list_key", words);
+  }
+
+  Future loadData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> data = new List();
+    data = prefs.getStringList("my_string_list_key");
+    setState(() {
+      words.addAll(data);
+    });
   }
 }
