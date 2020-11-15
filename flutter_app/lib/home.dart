@@ -105,6 +105,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   backgroundColor: Colors.green,
                   onPressed: () {
                     setState(() {
+                      print("FAB Pressed!");
                       visible.clear();
                       visibleItems();
                       if (visible.isEmpty || words.isEmpty) {
@@ -147,6 +148,7 @@ class _MyHomePageState extends State<MyHomePage> {
         words.clear();
         visible.clear();
         images.clear();
+
         break;
       case Constants.about:
         Navigator.push(

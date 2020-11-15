@@ -11,13 +11,7 @@ class AddNamePage extends StatefulWidget {
 class _AddNamePageState extends State<AddNamePage> {
   // this allows us to access the TextField text
   TextEditingController textFieldController = TextEditingController();
-
-  bool _canSave = false;
   ModelData _data = ModelData.empty();
-
-  void _setCanSave(bool save) {
-    if (save != _canSave) setState(() => _canSave = save);
-  }
 
   @override
   Widget build(BuildContext context) {
