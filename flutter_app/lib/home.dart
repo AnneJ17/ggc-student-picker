@@ -35,79 +35,97 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar:
-            AppBar(title: Text('GGC Thorns, Roses and Buds'), actions: <Widget>[
-          PopupMenuButton<String>(
-            onSelected: (String result) {
-              setState(() {
-                choiceAction(result);
-              });
-            },
-            itemBuilder: (BuildContext context) {
-              return Constants.choices.map((String choice) {
-                    return PopupMenuItem<String>(
-                      value: choice,
-                      child: Text(choice),
-                    );
-                  })?.toList() ??
-                  [];
-            },
-          )
-        ]),
-        body: Column(
-          children: <Widget>[
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  _suggestions.addAll(generateWordPairs().take(5));
-                  for (var i = 0; i < 5; i++) {
-                    words.add(_suggestions[i].first);
-                  }
-                  visible.clear();
-                  visibleItems();
-                  writeState();
-                });
-              }, // handle your image tap here
-              child: Image.asset('assets/bbuildingwavy.jpg'),
-            ),
-            if (show)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(left: 110.0, top: 30),
-                    child: Text(
-                      (visible != null && visible.length > 0)
-                          ? visible[_random.nextInt(visible.length)]
-                          : "",
-                      style: TextStyle(fontSize: 27),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 110.0, top: 30),
-                    child: Image.asset(
-                      (images != null && images.length > 0)
-                          ? images[_random.nextInt(images.length)]
-                          : "",
-                      height: 50,
-                    ),
-                  )
-                ],
-              ),
-            Expanded(child: _buildSuggestions())
-          ],
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-        floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.autorenew),
-          backgroundColor: Colors.green,
-          onPressed: () {
+      appBar:
+          AppBar(title: Text('GGC Thorns, Roses and Buds'), actions: <Widget>[
+        PopupMenuButton<String>(
+          onSelected: (String result) {
             setState(() {
-              show = true;
-              images.shuffle();
+              choiceAction(result);
             });
           },
-        ));
+          itemBuilder: (BuildContext context) {
+            return Constants.choices.map((String choice) {
+                  return PopupMenuItem<String>(
+                    value: choice,
+                    child: Text(choice),
+                  );
+                })?.toList() ??
+                [];
+          },
+        )
+      ]),
+      body: Column(
+        children: <Widget>[
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _suggestions.addAll(generateWordPairs().take(5));
+                for (var i = 0; i < 5; i++) {
+                  words.add(_suggestions[i].first);
+                }
+                visible.clear();
+                visibleItems();
+                writeState();
+              });
+            }, // handle your image tap here
+            child: Image.asset('assets/bbuildingwavy.jpg'),
+          ),
+          if (show)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.only(left: 110.0, top: 30),
+                  child: Text(
+                    (visible != null && visible.length > 0)
+                        ? visible[_random.nextInt(visible.length)]
+                        : "",
+                    style: TextStyle(fontSize: 27),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 110.0, top: 30),
+                  child: Image.asset(
+                    (images != null && images.length > 0)
+                        ? images[_random.nextInt(images.length)]
+                        : "",
+                    height: 50,
+                  ),
+                )
+              ],
+            ),
+          Expanded(child: _buildSuggestions()),
+          Builder(
+            builder: (context) => Align(
+              alignment: Alignment.bottomRight,
+              child: Container(
+                padding: EdgeInsets.only(right: 27, bottom: 27),
+                child: FloatingActionButton(
+                  child: Icon(Icons.autorenew),
+                  backgroundColor: Colors.green,
+                  onPressed: () {
+                    setState(() {
+                      visible.clear();
+                      visibleItems();
+                      if (visible.isEmpty || words.isEmpty) {
+                        show = false;
+                        // show snack bar
+                        Scaffold.of(context).showSnackBar(SnackBar(
+                          content: Text("Names are hidden or list is empty"),
+                        ));
+                      } else {
+                        show = true;
+                        images.shuffle();
+                      }
+                    });
+                  },
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void choiceAction(String choice) {
@@ -128,7 +146,7 @@ class _MyHomePageState extends State<MyHomePage> {
       case Constants.clear:
         words.clear();
         visible.clear();
-        // images.clear();
+        images.clear();
         break;
       case Constants.about:
         Navigator.push(

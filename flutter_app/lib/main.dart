@@ -1,3 +1,10 @@
+/*
+ * Name: GGC Student Picker
+ * Date: Nov 15, 2020
+ * Author: Anne Joseph
+ * Course Name: ITEC 4550 - Mobile App Development
+ */
+
 import 'package:flutter/material.dart';
 import 'home.dart';
 

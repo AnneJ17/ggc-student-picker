@@ -23,7 +23,16 @@ class _AddNamePageState extends State<AddNamePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          leading: Icon(Icons.clear),
+          leading: Builder(
+            builder: (BuildContext context) {
+              return IconButton(
+                icon: Icon(Icons.clear),
+                onPressed: () {
+                  textFieldController.clear();
+                },
+              );
+            },
+          ),
           title: Text('Add Student Name'),
           actions: <Widget>[
             FlatButton(
