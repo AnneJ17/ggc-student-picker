@@ -21,7 +21,6 @@ class _AddNamePageState extends State<AddNamePage> {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
     return Scaffold(
         appBar: AppBar(
           leading: Icon(Icons.clear),
